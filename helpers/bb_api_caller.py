@@ -1,6 +1,7 @@
 import base64
 from configparser import SafeConfigParser
 import json
+import logging
 import requests
 from models.credential import Credential
 import helpers.utils as utils
@@ -23,6 +24,7 @@ class BBAPICaller:
 
 
     _config: Config
+    _logger = logging.getLogger(__name__)
 
     url_pullrequest   = '/rest/api/1.0/projects/{}/repos/{}/pull-requests'
     url_pr_change     = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/changes'
@@ -51,13 +53,11 @@ class BBAPICaller:
     def do_get(self, url, params=None, *args):
         url = self.construct_url(url, args[0])
 
-        #TODO: Change to logger
-        print ('--> URL: {}'.format(url))
+        self._logger.info ('Initiating GET call to: {}'.format(url))
         
         response = requests.get(url, params=params, headers=self.construct_header()).json()
         
-        #TODO: Change to logger
-        print ('--> Response:{}'.format(response))
+        self._logger.debug (f'GET from [{url}] receiving response:{response}')
         
         return utils.json_to_object(json.dumps(response))
 
@@ -65,13 +65,11 @@ class BBAPICaller:
     def do_post(self, url, json_body, *args):
         url = self.construct_url(url, args[0])
 
-        #TODO: Change to logger
-        print ('--> URL: {}'.format(url))
+        self._logger.info ('Initiating POST call to: {}'.format(url))
         
         response = requests.post(url, json=json_body, headers=self.construct_header()).json()
         
-        #TODO: Change to logger
-        print ('--> Response:{}'.format(response))
+        self._logger.debug (f'POST to [{url}] receiving response:{response}')
         
         return utils.json_to_object(json.dumps(response))
 

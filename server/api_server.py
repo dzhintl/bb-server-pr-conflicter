@@ -1,4 +1,5 @@
 import hashlib
+import logging
 from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
 from flask_restful import Api, Resource
@@ -15,6 +16,7 @@ class AuthResource(Resource):
 
     auth = HTTPBasicAuth()
     credential: Credential
+    _logger = logging.getLogger(__name__)
 
     def __init__(self, credential: Credential) -> None:
         super().__init__()
@@ -54,7 +56,7 @@ class HMACResource(Resource):
     
     def post(self):
         request_data  = request.get_data()
-        response_code = 401
+        result = {'status': 401, 'message': 'Authorization failed'}, 401
 
         hash_mode  = self.credential.get_hmac_sha().lower()
         secret_key = self.credential.get_hmac_key()
@@ -68,12 +70,11 @@ class HMACResource(Resource):
                 client_signature = request.headers['X-Hub-Signature']
 
                 if signature == client_signature:
-                    return self.process_post()
+                    result = self.process_post()
         else:
-            #TODO: print error
-            pass
+            self._logger.error("Invalid hash mode detected. Configured hashing mode is: {} while supported modes are: {}".format(hash_mode, hashlib.algorithms_available))
         
-        return {'status': response_code, 'message': 'Authorization failed'}, response_code
+        return result
 
     def process_post(self):
         return {'status': 501, 'message': 'Method not supported'}, 501
@@ -103,5 +104,5 @@ class APIServer:
     def add_hmac_resource(self,resource: HMACResource, route: str):
         self.api.add_resource(resource.__class__, route, resource_class_args=[resource.credential, resource.api_caller])
 
-    def start(self, host: str, port: int):
-        self.app.run(debug = True, host = host, port = port)
+    def start(self, host: str, port: int, **kwargs):
+        self.app.run(debug = kwargs.get('debug', False), host = host, port = port)

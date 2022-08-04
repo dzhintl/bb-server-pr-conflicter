@@ -1,3 +1,4 @@
+import logging
 from flask import request
 from end_points.check_by_pr import DependencyByPR
 import helpers.bb_comment_maker
@@ -20,6 +21,8 @@ class DependencyByCommit(DependencyByPR):
                     - any: (Default) No restriction
     """
 
+    _logger = logging.getLogger(__name__)
+
     def process_post(self):
         #Get request parameter
         args = self.request_parser.parse_args()
@@ -31,14 +34,12 @@ class DependencyByCommit(DependencyByPR):
         #Only process if JSON payload is found
         if request.is_json:
             payload = self.process_payload()
-            #print (payload)
 
             commit_id    = payload.changes[0].toHash
             project_key  = payload.repository.project.key
             repo_slug    = payload.repository.slug
 
-            #TODO: Change to logger
-            print ('Commit ID: {}'.format(commit_id))
+            self._logger.info ('Receiving event {} with commit ID: {}'.format(payload.eventKey, commit_id))
 
             pr_list = self.api_caller.get_commit_pr(project_key, repo_slug, commit_id).values
 
@@ -52,8 +53,11 @@ class DependencyByCommit(DependencyByPR):
             if len(prs) > 0:
                 comments = []
                 for pr in prs:
-                    comments.append(helpers.bb_comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr), payload.eventKey, payload.date))
-
+                    comment = helpers.bb_comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr), payload.eventKey, payload.date)
+                    comments.append(comment)
+                    self._logger.debug(f'PR ID: {pr.id}, Comment: {comment}')
+                    self.api_caller.post_pr_comment(project_key, repo_slug, pr.id, comment)
+                
                 return {'status': 200, 'comment': comments}, 200
             else:
                 return {'status': 200, 'message': 'Nothing to do here'}, 200

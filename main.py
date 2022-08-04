@@ -1,3 +1,4 @@
+import logging
 from helpers.bb_api_caller import BBAPICaller
 from server.api_server import APIServer, Credential
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
@@ -8,12 +9,17 @@ from end_points.check_by_commit import DependencyByCommit
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument("-conf", "--config_file", help="Location of the application config file")
 parser.add_argument("-p", "--port", default=8080, type=int, help="Port")
+parser.add_argument("-log", "--log_file", default=None, type=str, help="Location of the log file. Default is system log")
+parser.add_argument("-d", "--debug_level", default="WARNING", type=str, help="Debug Level CRITICAL/ERROR/WARNING/INFO. Default is WARNING")
 args = vars(parser.parse_args())
 
 PORT      = args["port"]
 CONF_FILE = args["config_file"]
+LOG_FILE  = args["log_file"]
+LOG_LEVEL = args["debug_level"]
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
+    logging.basicConfig(filename=LOG_FILE, format='%(asctime)s %(levelname)s [%(name)s] %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level = LOG_LEVEL.upper())
     #HMAC Authentication
     hmac_credential = Credential(CONF_FILE, 'HMAC')
 
@@ -28,4 +34,4 @@ if __name__ == '__main__':
     server = APIServer("BB Branch Checker")
     server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr')
     server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit')
-    server.start('0.0.0.0', PORT)
+    server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))

@@ -1,3 +1,4 @@
+import logging
 from flask import request
 from helpers.bb_api_caller import BBAPICaller
 from models.pullrequest import PullRequest
@@ -24,6 +25,7 @@ class DependencyByPR(HMACResource):
     """
 
     allowed_target = ['any', 'master']
+    _logger = logging.getLogger(__name__)
 
     def __init__(self, cred: Credential, api_caller: BBAPICaller) -> None:
         super().__init__(cred, api_caller)
@@ -45,12 +47,12 @@ class DependencyByPR(HMACResource):
             pr_target = payload.pullRequest.toRef.displayId
             pr_id     = payload.pullRequest.id
 
-            #TODO: Change to logger
-            print ('ID: {}, Event: {}, Target: {}'.format(pr_id, payload.eventKey, pr_target))
+            self._logger.info ('Receiving PR event with PR ID: {}, Event: {}, Target: {}'.format(pr_id, payload.eventKey, pr_target))
 
             if target == 'any' or target == pr_target:
                 change_list = self.check_pr_conflicts(payload.pullRequest)
                 comment = helpers.bb_comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
+                self._logger.debug(f'Comment: {comment}')
                 self.api_caller.post_pr_comment(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id, comment)
                 return {'status': 200, 'comment': comment}, 200
             else:
