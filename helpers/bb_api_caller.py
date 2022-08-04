@@ -35,11 +35,14 @@ class BBAPICaller:
         config_parser = SafeConfigParser()
         config_parser.read(config_file)
 
-        if config_parser.has_option(section, BBAPICaller.Config.KEY_URL):
-            url = config_parser.get(section, BBAPICaller.Config.KEY_URL)
-            self._config = BBAPICaller.Config(url, Credential(config_file, section))
-        else:
-            raise Exception ('Exception while setting up config')
+        try:
+            if config_parser.has_option(section, BBAPICaller.Config.KEY_URL):
+                url = config_parser.get(section, BBAPICaller.Config.KEY_URL)
+                self._config = BBAPICaller.Config(url, Credential(config_file, section))
+            else:
+                self._logger.fatal(f"BB_URL is NOT found under {section} section")
+        except:
+            self._logger.fatal("Configuration setup failed!")
     
 
     def construct_url(self, url:str, *args):
