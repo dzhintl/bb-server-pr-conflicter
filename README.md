@@ -30,7 +30,7 @@ optional arguments:
   -conf CONFIG_FILE,    --config_file   CONFIG_FILE     Location of the application config file (default: ./config.properties)
   -p    PORT,           --port          PORT            Port (default: 8080)
   -log  LOG_FILE,       --log_file      LOG_FILE        Location of the log file. Default is system log (default: None)
-  -d    DEBUG_LEVEL,    --debug_level   DEBUG_LEVEL     Debug Level CRITICAL/ERROR/WARNING/INFO. Default is WARNING (default: WARNING)
+  -d    DEBUG_LEVEL,    --debug_level   DEBUG_LEVEL     Debug Level CRITICAL/ERROR/WARNING/INFO/DEBUG. Default is WARNING (default: WARNING)
 ```
 
 ### Config file
