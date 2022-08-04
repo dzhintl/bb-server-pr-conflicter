@@ -32,6 +32,6 @@ if __name__ == '__main__':
     
     #Setup API Server and end-points
     server = APIServer("BB Branch Checker")
-    server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr')
-    server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit')
+    server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr/comment')
+    server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit/comment')
     server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))
