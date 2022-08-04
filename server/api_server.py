@@ -45,6 +45,7 @@ class HMACResource(Resource):
     request_parser = RequestParser()
     credential: Credential
     api_caller: BBAPICaller
+    _logger = logging.getLogger(__name__)
 
     def __init__(self, cred: Credential, api_caller: BBAPICaller) -> None:
         super().__init__()
@@ -61,19 +62,24 @@ class HMACResource(Resource):
         hash_mode  = self.credential.get_hmac_sha().lower()
         secret_key = self.credential.get_hmac_key()
 
-        allowed = hashlib.algorithms_available
-        if hash_mode in allowed:
-            digest = hmac.new(secret_key, msg=request_data, digestmod=getattr(hashlib, hash_mode)).hexdigest()
-            signature = f'{hash_mode}={digest}'
+        #Need to check if HMAC is needed
+        client_signature = None
+        if 'X-Hub-Signature' in request.headers:
+            client_signature = request.headers['X-Hub-Signature']
 
-            if 'X-Hub-Signature' in request.headers:
-                client_signature = request.headers['X-Hub-Signature']
+        if secret_key is not None and client_signature is not None:
+            allowed = hashlib.algorithms_available
+            if hash_mode in allowed:
+                digest = hmac.new(secret_key, msg=request_data, digestmod=getattr(hashlib, hash_mode)).hexdigest()
+                signature = f'{hash_mode}={digest}'
 
                 if signature == client_signature:
                     result = self.process_post()
-        else:
-            self._logger.error("Invalid hash mode detected. Configured hashing mode is: {} while supported modes are: {}".format(hash_mode, hashlib.algorithms_available))
-        
+            else:
+                self._logger.error("Invalid hash mode detected. Configured hashing mode is: {} while supported modes are: {}".format(hash_mode, hashlib.algorithms_available))
+        elif secret_key is None and client_signature is None:
+            result = self.process_post()
+
         return result
 
     def process_post(self):

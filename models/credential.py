@@ -1,5 +1,6 @@
 import base64
 from configparser import SafeConfigParser
+import logging
 
 
 class Credential:
@@ -14,6 +15,8 @@ class Credential:
     hmac_sha = 'SHA256'
     username = ''
     password = ''
+
+    _logger = logging.getLogger(__name__)
 
     def __init__(self, config_file, section) -> None:
         config_parser = SafeConfigParser()
@@ -31,6 +34,8 @@ class Credential:
         if config_parser.has_option(section, self.KEY_PASSWORD):
             self.password = config_parser.get(section, self.KEY_PASSWORD)
         
+        self._logger.debug(f'Config file {config_file} received: {config_parser.items(section)} at section {section}')
+
 
     def get_password(self) -> str:
         return base64.b64decode(self.password).decode('utf-8')
@@ -39,7 +44,10 @@ class Credential:
         return base64.b64decode(self.username).decode('utf-8')
 
     def get_hmac_key(self) -> bytes:
-        return base64.b64decode(self.hmac_key)
+        if not self.hmac_key:
+            return None
+        else:
+            return base64.b64decode(self.hmac_key)
 
     def get_hmac_sha(self) -> str:
         return self.hmac_sha

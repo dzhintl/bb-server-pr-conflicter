@@ -43,12 +43,13 @@ class DependencyByCommit(DependencyByPR):
 
             pr_list = self.api_caller.get_commit_pr(project_key, repo_slug, commit_id).values
 
-            open_prs = [pr for pr in pr_list if pr.state=='OPEN']
+            open_prs = []
+            open_prs.extend([pr for pr in pr_list if pr.state=='OPEN'])
             prs = []
             if target == 'master':
-                prs = [pr for pr in open_prs if pr.toRef.displayId == target]
+                prs.extend([pr for pr in open_prs if pr.toRef.displayId == target])
             elif target == 'any':
-                prs = open_prs
+                prs.extend(open_prs)
 
             if len(prs) > 0:
                 comments = []
