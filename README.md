@@ -14,7 +14,7 @@ An application to integrate with Bitbucket Server Webhook service to do the foll
 | Repository | Push | repo:refs_changed |
 | Pull Request | All Events | pr:* |
 
-## [Docker](https://hub.docker.com/r/donkeystudio/bitbucket-server-pr-conflict-checker)
+## [Docker](https://hub.docker.com/r/donkeystudio/bb-server-pr-conflicter)
 Supported architectures: `linux/arm/v7`, `linux/arm64`, `linux/amd64`
 
 ## Startup Configuration
