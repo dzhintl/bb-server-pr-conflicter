@@ -1,8 +1,7 @@
 FROM python:3.10-slim-bullseye
 
 WORKDIR /donkeystudio
-ADD main.py .
-ADD requirements.txt .
+ADD . .
 
 ENV TZ="Asia/Singapore"
 RUN ln -snf /user/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
