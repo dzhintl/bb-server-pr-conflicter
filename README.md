@@ -72,6 +72,10 @@ Check and make a comment into the current Pull Request a list of PR Dependencies
 }
 ```
 
+**Sample comment on Bitbucket**
+
+![Bitbucket Comment](/sample/BB_Comment.png)
+
 ### check_dependency/by_commit/comment
 ```http
 POST /check_dependency/by_commit/comment?target=master|any(default)
