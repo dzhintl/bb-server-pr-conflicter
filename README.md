@@ -2,8 +2,8 @@
 An application to integrate with Bitbucket Server Webhook service to do the following:
 1. Receiving Pull Request events and Repository/Push events (Learn more about Bitbucket event payloads [here](https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html))
 1. With the current pull request, check if:
-  1. There is any other OPENED pull request pointing to the same target branch.
-  1. There is any potential conflict file with the current pull request.
+    1. There is any other OPENED pull request pointing to the same target branch.
+    1. There is any potential conflict file with the current pull request.
 
 ## Use cases
 * You are maintaining multiple OPEN release branches that are branched from master and would like to be notified on any potential conflict caused by same files being changed accross release branches.
