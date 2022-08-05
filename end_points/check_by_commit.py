@@ -1,4 +1,5 @@
 import logging
+import time
 from flask import request
 from end_points.check_by_pr import DependencyByPR
 import helpers.bb_comment_maker
@@ -40,7 +41,7 @@ class DependencyByCommit(DependencyByPR):
             repo_slug    = payload.repository.slug
 
             self._logger.info ('Receiving event {} with commit ID: {}'.format(payload.eventKey, commit_id))
-
+            time.sleep(1)
             pr_list = self.api_caller.get_commit_pr(project_key, repo_slug, commit_id).values
 
             open_prs = []
