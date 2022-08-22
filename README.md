@@ -17,6 +17,11 @@ An application to integrate with Bitbucket Server Webhook service to do the foll
 ## [Docker](https://hub.docker.com/r/donkeystudio/bb-server-pr-conflicter)
 Supported architectures: `linux/arm/v7`, `linux/arm64`, `linux/amd64`
 
+## Dependencies
+```
+python3 -m pip install -r requirements.txt
+```
+
 ## Startup Configuration
 ```
 python3 main.py --help
