@@ -3,6 +3,7 @@ import time
 from flask import request
 from end_points.check_by_pr import DependencyByPR
 import helpers.bb_comment_maker
+import helpers.utils as utils
 
 
 class DependencyByCommit(DependencyByPR):
@@ -42,7 +43,7 @@ class DependencyByCommit(DependencyByPR):
 
             self._logger.info ('Receiving event {} with commit ID: {}'.format(payload.eventKey, commit_id))
             time.sleep(1)
-            pr_list = self.api_caller.get_pull_requests(project_key, repo_slug, target_branch=f'refs/heads/{target}' if target != 'any' else 'any').values
+            pr_list = self.api_caller.get_commit_pr(project_key, repo_slug, commit_id).values
 
             open_prs = []
             open_prs.extend([pr for pr in pr_list if pr.state=='OPEN'])
@@ -59,6 +60,9 @@ class DependencyByCommit(DependencyByPR):
                     comments.append(comment)
                     self._logger.debug(f'PR ID: {pr.id}, Comment: {comment}')
                     self.api_caller.post_pr_comment(project_key, repo_slug, pr.id, comment)
+                    jira_key = utils.get_jira_key(payload.changes[0].ref.displayId)
+                    if jira_key is not None:
+                        self.api_caller_jira.do_jira_comment(jira_key, comment)
                 
                 return {'status': 200, 'comment': comments}, 200
             else:

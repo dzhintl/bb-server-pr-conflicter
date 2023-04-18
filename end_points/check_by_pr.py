@@ -1,8 +1,10 @@
 import logging
 from flask import request
-from helpers.bb_api_caller import BBAPICaller
+from helpers.api_caller_bb import APICallerBB
+from helpers.api_caller_jira import APICallerJIRA
+import helpers.utils as utils
 from models.pullrequest import PullRequest
-from server.api_server import HMACResource, Credential
+from server.api_server import HMACResource
 import helpers.bb_comment_maker
 
 class DependencyByPR(HMACResource):
@@ -27,9 +29,15 @@ class DependencyByPR(HMACResource):
     allowed_target = ['any', 'master']
     _logger = logging.getLogger(__name__)
 
-    def __init__(self, cred: Credential, api_caller: BBAPICaller) -> None:
-        super().__init__(cred, api_caller)
+    api_caller_jira: APICallerJIRA
+    api_caller:      APICallerBB
+
+    def __init__(self, config_file, *args) -> None:
+        super().__init__(config_file, args)
         self.request_parser.add_argument('target', default='any')
+        self.api_caller      = APICallerBB(args[0][0])
+        self.api_caller_jira = APICallerJIRA(args[0][1])
+
 
     def process_post(self):
         #Get request parameter
@@ -54,6 +62,10 @@ class DependencyByPR(HMACResource):
                 comment = helpers.bb_comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
                 self._logger.debug(f'Comment: {comment}')
                 self.api_caller.post_pr_comment(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id, comment)
+                jira_key = utils.get_jira_key(payload.pullRequest.fromRef.displayId)
+                if jira_key is not None:
+                    self.api_caller_jira.do_jira_comment(jira_key, comment)
+                    
                 return {'status': 200, 'comment': comment}, 200
             else:
                 return {'status': 200, 'message': 'Nothing to do here'}, 200

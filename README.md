@@ -39,7 +39,7 @@ optional arguments:
 ```
 
 ### Config file
-Config file consists of 2 sections
+Config file consists of 3 sections
 ```
 [HMAC]
 HMAC_KEY={Optional. Secret key to authenticate with Bitbucket. In Base64 encoded format}
@@ -61,7 +61,7 @@ PASSWORD={Required. Password to authenticate with Bitbucket to access its REST A
 ```http
 POST /check_dependency/by_pr/comment?target=master|any(default)
 ```
-Check and make a comment into the current Pull Request a list of PR Dependencies. The check is done on all open PRs targeting to the same branch (e.g. master) as the current Pull Request.
+Check and make a comment into the current Pull Request as well as to the source JIRA ticket a list of PR Dependencies.
 
 **Request Options**
 
@@ -85,7 +85,7 @@ Check and make a comment into the current Pull Request a list of PR Dependencies
 ```http
 POST /check_dependency/by_commit/comment?target=master|any(default)
 ```
-Check and make a comment into Pull Request of the current commit a list of PR Dependencies. The check is done on all open PRs targeting to the same branch (e.g. master) as the Pull Request of the current commit.
+Check and make a comment into Pull Request of the current commit as well as to the source JIRA ticket a list of PR Dependencies.
 
 **Request Options**
 

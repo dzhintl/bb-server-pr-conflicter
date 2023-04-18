@@ -1,6 +1,6 @@
 import logging
-from helpers.bb_api_caller import BBAPICaller
-from server.api_server import APIServer, Credential
+from helpers.api_caller_bb import APICallerBB
+from server.api_server import APIServer
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from end_points.check_by_pr import DependencyByPR
 from end_points.check_by_commit import DependencyByCommit
@@ -20,18 +20,14 @@ LOG_LEVEL = args["debug_level"]
 
 if __name__ == '__main__':
     logging.basicConfig(filename=LOG_FILE, format='%(asctime)s %(levelname)s [%(name)s] %(message)s', datefmt='%m/%d/%Y %H:%M:%S', level = LOG_LEVEL.upper())
-    #HMAC Authentication
-    hmac_credential = Credential(CONF_FILE, 'HMAC')
 
-    #API Caller
-    api_caller = BBAPICaller(CONF_FILE, 'BB-API')
     
     #API Resources
-    dependency_by_pr = DependencyByPR(hmac_credential, api_caller)
-    dependency_by_commit = DependencyByCommit(hmac_credential, api_caller)
+    dependency_by_pr = DependencyByPR(CONF_FILE, [CONF_FILE, CONF_FILE])
+    dependency_by_commit = DependencyByCommit(CONF_FILE, [CONF_FILE, CONF_FILE])
     
     #Setup API Server and end-points
     server = APIServer("BB Branch Checker")
-    server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr/comment')
-    server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit/comment')
+    server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr/comment', [CONF_FILE, CONF_FILE])
+    server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit/comment', [CONF_FILE, CONF_FILE])
     server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))

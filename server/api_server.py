@@ -1,40 +1,12 @@
+from configparser import ConfigParser
 import hashlib
 import logging
 from flask import Flask, request
-from flask_httpauth import HTTPBasicAuth
 from flask_restful import Api, Resource
 from flask_restful.reqparse import RequestParser
 import hmac
-from helpers.bb_api_caller import BBAPICaller
+from helpers.api_caller_bb import APICallerBB
 import helpers.utils as utils
-from models.credential import Credential
-
-
-class AuthResource(Resource):
-    ''' Resource class with HTTP Basic Authentication supported
-    '''
-
-    auth = HTTPBasicAuth()
-    credential: Credential
-    _logger = logging.getLogger(__name__)
-
-    def __init__(self, credential: Credential) -> None:
-        super().__init__()
-        self.credential = credential
-
-    @auth.login_required
-    def get(self):
-        pass
-    
-    @auth.login_required
-    def post(self):
-        pass
-
-    @auth.verify_password
-    def verify_password(self, username, password):
-        if username == self.credential.get_username() and password == self.credential.get_password():
-            return True
-        return False
 
 
 class HMACResource(Resource):
@@ -43,14 +15,28 @@ class HMACResource(Resource):
     
     __name__ = 'HMACResource'
     request_parser = RequestParser()
-    credential: Credential
-    api_caller: BBAPICaller
     _logger = logging.getLogger(__name__)
 
-    def __init__(self, cred: Credential, api_caller: BBAPICaller) -> None:
+    SECTION="HMAC"
+    CONFIG_KEY="CONFIG"
+
+    _config: None
+    config_file: None
+
+    def __init__(self, config_file, *args) -> None:
         super().__init__()
-        self.credential = cred
-        self.api_caller = api_caller
+        self.config_file = config_file
+        config_parser = ConfigParser()
+        config_parser.read(config_file)
+
+        try:
+            if config_parser.has_option(self.SECTION, self.CONFIG_KEY):
+                self._config = utils.json_to_object(config_parser.get(self.SECTION, self.CONFIG_KEY))
+            else:
+                self._logger.fatal(f"CONFIG is NOT found under {self.SECTION} section")
+        except:
+            self._logger.fatal("Configuration setup failed!")
+
 
     def get(self):
         return self.process_get()
@@ -59,8 +45,11 @@ class HMACResource(Resource):
         request_data  = request.get_data()
         result = {'status': 401, 'message': 'Authorization failed'}, 401
 
-        hash_mode  = self.credential.get_hmac_sha().lower()
-        secret_key = self.credential.get_hmac_key()
+        secret_key = None
+        if self._config.key:
+            secret_key = utils.base64_decode(self._config.key, output=None)
+        
+        hash_mode  = self._config.type.lower()
 
         #Need to check if HMAC is needed
         client_signature = None
@@ -107,8 +96,8 @@ class APIServer:
         self.app = Flask(app_name)
         self.api = Api(self.app)
 
-    def add_hmac_resource(self,resource: HMACResource, route: str):
-        self.api.add_resource(resource.__class__, route, resource_class_args=[resource.credential, resource.api_caller])
+    def add_hmac_resource(self,resource: HMACResource, route: str, *args):
+        self.api.add_resource(resource.__class__, route, resource_class_args=[resource.config_file, *args])
 
     def start(self, host: str, port: int, **kwargs):
         self.app.run(debug = kwargs.get('debug', False), host = host, port = port)
