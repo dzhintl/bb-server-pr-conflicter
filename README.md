@@ -42,13 +42,24 @@ optional arguments:
 Config file consists of 3 sections
 ```
 [HMAC]
-HMAC_KEY={Optional. Secret key to authenticate with Bitbucket. In Base64 encoded format}
-HMAC_SHA={Optional. HMACSHA Algorithm. Default is SHA256}
+CONFIG={
+    "key": {Optional. Secret key to authenticate with Bitbucket. In Base64 encoded format},
+    "type": {Optional. HMACSHA Algorithm. Default is SHA256}
+    }
 
 [BB-API]
-BB_URL={Required. Bitbucket URL, e.g. http://localhost:7990}
-USERNAME={Required. Username to authenticate with Bitbucket to access its REST API. In Base64 encoded format.}
-PASSWORD={Required. Password to authenticate with Bitbucket to access its REST API. In Base64 encoded format.}
+CONFIG={
+    "url": {Required. Bitbucket URL, e.g. http://localhost:7990},
+    "id": {Required. Username to authenticate with Bitbucket to access its REST API. In Base64 encoded format.},
+    "key": {Required. Password to authenticate with Bitbucket to access its REST API. In Base64 encoded format.}
+    }
+
+[JIRA-API]
+CONFIG={
+    "url": {Required. JIRA URL, e.g. http://localhost:7990},
+    "id": {Required. Username to authenticate with JIRA to access its REST API. In Base64 encoded format.},
+    "key": {Required. Password to authenticate with JIRA to access its REST API. In Base64 encoded format.}
+    }
 ```
 
 ## API End-points
