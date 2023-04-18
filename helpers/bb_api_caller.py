@@ -29,7 +29,6 @@ class BBAPICaller:
     url_pullrequest   = '/rest/api/1.0/projects/{}/repos/{}/pull-requests'
     url_pr_change     = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/changes'
     url_pr_comments   = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
-    url_commit_pr     = '/rest/api/1.0/projects/{}/repos/{}/commits/{}/pull-requests'
 
     def __init__(self, config_file, section) -> None:
         config_parser = SafeConfigParser()
@@ -77,11 +76,13 @@ class BBAPICaller:
         return utils.json_to_object(json.dumps(response))
 
 
-    def get_pull_requests(self, project_key, repository_slug, target_branch, state='OPEN'):
+    def get_pull_requests(self, project_key, repository_slug, target_branch='any', state='OPEN'):
         params = {
-            'at': target_branch,
             'state': state
         }
+        if target_branch != 'any':
+            params['at'] = target_branch
+
         return self.do_get(self.url_pullrequest, params, (project_key,repository_slug))
 
     
@@ -94,9 +95,5 @@ class BBAPICaller:
             'text': comment
         }
         return self.do_post(self.url_pr_comments, json_body, (project_key,repository_slug, pr_id))
-
-    
-    def get_commit_pr(self, project_key, repository_slug, commit_id):
-        return self.do_get(self.url_commit_pr, None, (project_key, repository_slug, commit_id))
 
     

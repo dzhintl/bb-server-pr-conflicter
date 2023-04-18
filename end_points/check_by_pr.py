@@ -50,7 +50,7 @@ class DependencyByPR(HMACResource):
             self._logger.info ('Receiving PR event with PR ID: {}, Event: {}, Target: {}'.format(pr_id, payload.eventKey, pr_target))
 
             if target == 'any' or target == pr_target:
-                change_list = self.check_pr_conflicts(payload.pullRequest)
+                change_list = self.check_pr_conflicts(payload.pullRequest, target)
                 comment = helpers.bb_comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
                 self._logger.debug(f'Comment: {comment}')
                 self.api_caller.post_pr_comment(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id, comment)
@@ -61,12 +61,12 @@ class DependencyByPR(HMACResource):
             return {'status': 415, 'message': 'Come on! Give me JSON payload!'}, 415
 
 
-    def check_pr_conflicts(self, pull_request):
+    def check_pr_conflicts(self, pull_request, target):
         project_key = pull_request.toRef.repository.project.key
         repo_slug   = pull_request.toRef.repository.slug
         branch_id   = pull_request.toRef.id
 
-        all_prs = self.api_caller.get_pull_requests(project_key, repo_slug, branch_id).values
+        all_prs = self.api_caller.get_pull_requests(project_key, repo_slug, target_branch=branch_id if target != 'any' else 'any').values
         #Case 1 - No other PR
         #Case 2 - No conflict
         #Case 3 - Have conflict

@@ -42,7 +42,7 @@ class DependencyByCommit(DependencyByPR):
 
             self._logger.info ('Receiving event {} with commit ID: {}'.format(payload.eventKey, commit_id))
             time.sleep(1)
-            pr_list = self.api_caller.get_commit_pr(project_key, repo_slug, commit_id).values
+            pr_list = self.api_caller.get_pull_requests(project_key, repo_slug, target_branch=f'refs/heads/{target}' if target != 'any' else 'any').values
 
             open_prs = []
             open_prs.extend([pr for pr in pr_list if pr.state=='OPEN'])
@@ -55,7 +55,7 @@ class DependencyByCommit(DependencyByPR):
             if len(prs) > 0:
                 comments = []
                 for pr in prs:
-                    comment = helpers.bb_comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr), payload.eventKey, payload.date)
+                    comment = helpers.bb_comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr, target), payload.eventKey, payload.date)
                     comments.append(comment)
                     self._logger.debug(f'PR ID: {pr.id}, Comment: {comment}')
                     self.api_caller.post_pr_comment(project_key, repo_slug, pr.id, comment)
