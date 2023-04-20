@@ -41,10 +41,11 @@ optional arguments:
 ### Config file
 Config file consists of 3 sections
 ```
-[HMAC]
+[BB-WEBHOOK]
 CONFIG={
-    "key": {Optional. Secret key to authenticate with Bitbucket. In Base64 encoded format},
-    "type": {Optional. HMACSHA Algorithm. Default is SHA256}
+    "key": {Required. Secret key to authenticate with Bitbucket. In Base64 encoded format. Leave empty string if HMAC is disabled.},
+    "type": {Required. HMACSHA Algorithm. Leave empty string if HMAC is disabled.},
+    "allowJiraComment": {Required. Indicate if comment should be posted to Jira as well. true or false.}
     }
 
 [BB-API]

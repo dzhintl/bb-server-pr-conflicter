@@ -1,9 +1,8 @@
 import logging
-from helpers.api_caller_bb import APICallerBB
 from server.api_server import APIServer
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from end_points.check_by_pr import DependencyByPR
-from end_points.check_by_commit import DependencyByCommit
+from server.end_points.check_by_pr import DependencyByPR
+from server.end_points.check_by_commit import DependencyByCommit
 
 # Parse command line arguments
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
@@ -23,11 +22,11 @@ if __name__ == '__main__':
 
     
     #API Resources
-    dependency_by_pr = DependencyByPR(CONF_FILE, [CONF_FILE, CONF_FILE])
-    dependency_by_commit = DependencyByCommit(CONF_FILE, [CONF_FILE, CONF_FILE])
+    dependency_by_pr     = DependencyByPR([CONF_FILE])
+    dependency_by_commit = DependencyByCommit([CONF_FILE])
     
     #Setup API Server and end-points
     server = APIServer("BB Branch Checker")
-    server.add_hmac_resource(dependency_by_pr, '/check_dependency/by_pr/comment', [CONF_FILE, CONF_FILE])
-    server.add_hmac_resource(dependency_by_commit, '/check_dependency/by_commit/comment', [CONF_FILE, CONF_FILE])
+    server.add_resource(dependency_by_pr, '/check_dependency/by_pr/comment', [CONF_FILE])
+    server.add_resource(dependency_by_commit, '/check_dependency/by_commit/comment', [CONF_FILE])
     server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))
