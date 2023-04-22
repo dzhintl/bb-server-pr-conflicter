@@ -1,8 +1,8 @@
 import logging
 import time
 from flask import request
-from end_points.check_by_pr import DependencyByPR
-import helpers.bb_comment_maker
+from server.end_points.check_by_pr import DependencyByPR
+import helpers.comment_maker
 import helpers.utils as utils
 
 
@@ -56,13 +56,15 @@ class DependencyByCommit(DependencyByPR):
             if len(prs) > 0:
                 comments = []
                 for pr in prs:
-                    comment = helpers.bb_comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr, target), payload.eventKey, payload.date)
+                    comment = helpers.comment_maker.comment_pr_dependency(self.check_pr_conflicts(pr, target), payload.eventKey, payload.date)
                     comments.append(comment)
                     self._logger.debug(f'PR ID: {pr.id}, Comment: {comment}')
                     self.api_caller.post_pr_comment(project_key, repo_slug, pr.id, comment)
-                    jira_key = utils.get_jira_key(payload.changes[0].ref.displayId)
-                    if jira_key is not None:
-                        self.api_caller_jira.do_jira_comment(jira_key, comment)
+                    
+                    if self._config.jira.allow_comment:
+                        jira_key = utils.get_jira_key(payload.changes[0].ref.displayId)
+                        if jira_key is not None:
+                            self.api_caller_jira.do_jira_comment(jira_key, comment)
                 
                 return {'status': 200, 'comment': comments}, 200
             else:

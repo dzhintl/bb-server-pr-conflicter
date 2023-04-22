@@ -11,7 +11,7 @@ class APICallerBB (APICaller):
     URL_PR_CHANGE   = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/changes'
     URL_PR_COMMENT  = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
     URL_COMMIT_PR   = '/rest/api/1.0/projects/{}/repos/{}/commits/{}/pull-requests'
-    SECTION         = "BB-API"
+    CONFIG_SECTION  = "BB-API"
 
 
     def get_header(self):

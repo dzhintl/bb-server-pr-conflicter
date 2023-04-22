@@ -38,3 +38,23 @@ def comment_pr_dependency(change_list, event_key, event_date):
 
     return comment
 
+
+def comment_dependency(change_list, file_name):
+    comment = f'Conflict checking report for file: *{file_name}* \n' \
+              
+    if len(change_list) > 0:
+        comment += f'There are in total {len(change_list)} active pull requests that have modified this file:\n'
+        for pull_request in change_list:
+            comment += f'\n[{pull_request.title}]({pull_request.links.self[0].href}) \n' \
+                            f'- ID: {pull_request.id} \n' \
+                            f'- From: _{pull_request.fromRef.displayId}_ ' \
+                                f'(Repository:[{pull_request.fromRef.repository.name}]({pull_request.fromRef.repository.links.self[0].href}) \n '\
+                            f'- To: _{pull_request.toRef.displayId}_ ' \
+                                f'(Repository:[{pull_request.toRef.repository.name}]({pull_request.toRef.repository.links.self[0].href}) \n'\
+                            f'- Created Date: {datetime.utcfromtimestamp(pull_request.createdDate/1000)} \n' \
+                            f'- Last Updated: {datetime.utcfromtimestamp(pull_request.updatedDate/1000)} \n' \
+                            f'- Author: [{pull_request.author.user.displayName}]({pull_request.author.user.links.self[0].href}) \n'
+    else:
+        comment += "There is no potential conflict detected."
+
+    return comment

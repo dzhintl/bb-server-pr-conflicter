@@ -18,16 +18,16 @@ An application to integrate with Bitbucket Server Webhook service to do the foll
 Supported architectures: `linux/arm/v7`, `linux/arm64`, `linux/amd64`
 
 ## Dependencies
-```
+```bash
 python3 -m pip install -r requirements.txt
 ```
 
 ## Startup Configuration
-```
+```bash
 python3 main.py --help
 ```
 
-```
+```bash
 usage: main.py [-h] [-conf CONFIG_FILE] [-p PORT] [-log LOG_FILE] [-d DEBUG_LEVEL]
 
 optional arguments:
@@ -39,16 +39,56 @@ optional arguments:
 ```
 
 ### Config file
-Config file consists of 3 sections
-```
-[HMAC]
-HMAC_KEY={Optional. Secret key to authenticate with Bitbucket. In Base64 encoded format}
-HMAC_SHA={Optional. HMACSHA Algorithm. Default is SHA256}
+The main config file consists of 2 sections:
+```json
+[BB-WEBHOOK]
+CONFIG={
+        "key": <Required. Secret key to authenticate with Bitbucket. In Base64 encoded format. Leave empty string if HMAC is disabled.>,
+        "type": <Required. HMACSHA Algorithm. Leave empty string if HMAC is disabled.>,
+        "jira":
+        {
+            "allow_comment": <Required. Indicate if comment should be posted to Jira as well. true or false.>,
+            "config": <Required. Path to Jira configuration file.>
+        },
+        "bitbucket":
+        {
+            "config": <Required. Path to Bitbucket configuration file>
+        }
+    }
 
+[BB-ADHOC-REQUEST]
+CONFIG={
+        "api_key":
+        {
+            "key": <Required. API Key of the service. In Base64 encoded format. Leave empty string if API Key is disabled.>,
+            "header": <Required. Header field where the API Key is stored. Leave empty string if API Key is disabled.>
+        },
+       ....
+        "bitbucket":
+        {
+            "config": <Required. Path to Bitbucket configuration file.>
+        }
+    }
+```
+
+Bitbucket configuration file consists of 1 section:
+```json
 [BB-API]
-BB_URL={Required. Bitbucket URL, e.g. http://localhost:7990}
-USERNAME={Required. Username to authenticate with Bitbucket to access its REST API. In Base64 encoded format.}
-PASSWORD={Required. Password to authenticate with Bitbucket to access its REST API. In Base64 encoded format.}
+CONFIG={
+        "url": <Required. Bitbucket URL, e.g. http://localhost:7990>,
+        "id": <Required. Username to authenticate with Bitbucket to access its REST API. In Base64 encoded format.>,
+        "key": <Required. Password to authenticate with Bitbucket to access its REST API. In Base64 encoded format.>
+    }
+```
+
+Jira configuration file consists of 1 section:
+```json
+[JIRA-API]
+CONFIG={
+    "url": <Required. JIRA URL, e.g. http://localhost:7990>,
+    "id": <Required. Username to authenticate with JIRA to access its REST API. In Base64 encoded format.>,
+    "key": <Required. API Key to authenticate with JIRA to access its REST API. In Base64 encoded format.>
+    }
 ```
 
 ## API End-points
@@ -57,11 +97,13 @@ PASSWORD={Required. Password to authenticate with Bitbucket to access its REST A
 {"status": 200, "message": "Nothing to do here"}
 ```
 
-### check_dependency/by_pr/comment
+### `check_dependency/by_pr/comment`
 ```http
 POST /check_dependency/by_pr/comment?target=master|any(default)
 ```
 Check and make a comment into the current Pull Request as well as to the source JIRA ticket a list of PR Dependencies.
+
+**Authentication**: HMAC. Refer to [BB-WEBHOOK] config section.
 
 **Request Options**
 
@@ -81,11 +123,13 @@ Check and make a comment into the current Pull Request as well as to the source 
 
 ![Bitbucket Comment](/sample/BB_Comment.png)
 
-### check_dependency/by_commit/comment
+### `check_dependency/by_commit/comment`
 ```http
 POST /check_dependency/by_commit/comment?target=master|any(default)
 ```
 Check and make a comment into Pull Request of the current commit as well as to the source JIRA ticket a list of PR Dependencies.
+
+**Authentication**: HMAC. Refer to [BB-WEBHOOK] config section.
 
 **Request Options**
 
@@ -100,5 +144,29 @@ Check and make a comment into Pull Request of the current commit as well as to t
     "comment": [
         "_This is an auto generated message_ \n> * **Event Type:** repo:refs_changed  \n> * **Event Date:** 2022-08-04T06:33:23+0000  \n\nExcluding the current pull request, there are in total `1` other active pull requests. Please check the following information for any potential conflicts:  \n## [Release/release1](http://localhost:7990/projects/POC/repos/repo1/pull-requests/9) \n* **ID:** 9 \n* **From:** `release/release1` (Repository:[repo1](http://localhost:7990/projects/POC/repos/repo1/browse), Project:[POC](http://localhost:7990/projects/POC)) \n* **To:** `master` (Repository:[repo1](http://localhost:7990/projects/POC/repos/repo1/browse), Project:[POC](http://localhost:7990/projects/POC)) \n* **Created Date:** 2022-08-04 06:24:31.922000 \n* **Last Updated:** 2022-08-04 06:24:31.922000 \n* **Author:** [Iron Man](http://localhost:7990/users/tony.stark) \n* **Potential Conflict(s):** `1` file(s) \n  * File `file1.txt`, full path at `/file1.txt`. \n"
     ]
+}
+```
+### `/check_dependency/by_file/comment`
+```http
+POST /check_dependency/by_file/comment
+```
+Check and return a comment with a list of potential conflict pull requests.
+
+**Authentication**: API Key. Refer to [BB-ADHOC-REQUEST] config section.
+
+**JSON Request Body**
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "file": <Required. File name. String type. Must contain file extension, e.g. "awesome.txt">,
+    "repo": <Required. Repo ID. String type.>
+}
+```
+
+**Sample Response**
+```json
+{
+    "status": 200,
+    "comment": "Conflict checking report for file: *Awesome.txt* \nThere is no potential conflict detected."
 }
 ```
