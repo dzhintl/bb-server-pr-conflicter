@@ -1,7 +1,5 @@
 from flask import Flask
 from flask_restful import Api
-from hmac_resource import HMACResource
-from apikey_resource import APIKeyResource
 
 
 class APIServer:

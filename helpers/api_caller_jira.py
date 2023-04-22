@@ -6,7 +6,7 @@ class APICallerJIRA(APICaller):
     
     URL_JIRA_SEARCH   = "/rest/api/3/search"
     URL_JIRA_COMMENT  = '/rest/api/3/issue/{}/comment'
-    SECTION = "JIRA-API"
+    CONFIG_SECTION = "JIRA-API"
 
 
     def __init__(self, config_file) -> None:

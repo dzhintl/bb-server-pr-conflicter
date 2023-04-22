@@ -5,7 +5,7 @@ from helpers.api_caller_jira import APICallerJIRA
 import helpers.utils as utils
 from models.pullrequest import PullRequest
 from server.hmac_resource import HMACResource
-import helpers.bb_comment_maker
+import helpers.comment_maker
 
 class DependencyByPR(HMACResource):
     """ Check and make a comment into the current Pull Request a list of PR Dependencies.
@@ -26,7 +26,7 @@ class DependencyByPR(HMACResource):
                     - any: (Default) No restriction
     """
 
-    SECTION = "BB-WEBHOOK"
+    CONFIG_SECTION = "BB-WEBHOOK"
 
     allowed_target = ['any', 'master']
     _logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class DependencyByPR(HMACResource):
 
             if target == 'any' or target == pr_target:
                 change_list = self.check_pr_conflicts(payload.pullRequest, target)
-                comment = helpers.bb_comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
+                comment = helpers.comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
                 self._logger.debug(f'Comment: {comment}')
                 self.api_caller.post_pr_comment(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id, comment)
 

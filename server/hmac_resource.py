@@ -16,7 +16,7 @@ class HMACResource(Resource):
     request_parser = RequestParser()
     _logger = logging.getLogger(__name__)
 
-    SECTION=""
+    CONFIG_SECTION=""
     CONFIG_KEY="CONFIG"
 
     _config: None
@@ -27,10 +27,10 @@ class HMACResource(Resource):
         config_parser.read(args[0][0])
 
         try:
-            if config_parser.has_option(self.SECTION, self.CONFIG_KEY):
-                self._config = utils.json_to_object(config_parser.get(self.SECTION, self.CONFIG_KEY))
+            if config_parser.has_option(self.CONFIG_SECTION, self.CONFIG_KEY):
+                self._config = utils.json_to_object(config_parser.get(self.CONFIG_SECTION, self.CONFIG_KEY))
             else:
-                self._logger.fatal(f"CONFIG is NOT found under {self.SECTION} section")
+                self._logger.fatal(f"CONFIG is NOT found under {self.CONFIG_SECTION} section")
         except:
             self._logger.fatal("Configuration setup failed!")
 

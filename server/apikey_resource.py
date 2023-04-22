@@ -42,7 +42,8 @@ class APIKeyResource(Resource):
                 json_schema = self.get_request_schema()
                 validate(instance=json_pay_load, schema=json_schema, format_checker=FormatChecker())
                 return self.process_post()
-            except:
+            except Exception as error:
+                self._logger.error (f'Receive invalid request with error: {error}')
                 return self.process_invalid_schema()
 
         return self.process_invalid_apikey()
@@ -69,7 +70,7 @@ class APIKeyResource(Resource):
     
 
     def process_invalid_apikey(self):
-        result = {'status': 401, 'message': 'Authorization failed'}, 401
+        return {'status': 401, 'message': 'Authorization failed'}, 401
     
 
     def get_config_apikey(self):
