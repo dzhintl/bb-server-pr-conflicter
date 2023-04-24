@@ -59,7 +59,7 @@ class DependencyByRequest(APIKeyResource):
             
             #Case 2 - No conflict
             #Case 3 - Have conflict
-            if len(all_prs) > 1:
+            if len(all_prs) > 0:
                 for pr in all_prs:
                     pr_changes = self.api_caller.get_pr_change(project_key, repo_slug, pr.id).values
                     #Default is Case 2
