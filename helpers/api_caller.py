@@ -53,9 +53,10 @@ class APICaller:
 
         self._logger.info ('Initiating GET call to: {}'.format(url))
         
-        response = requests.get(url, params=params, headers=self.construct_auth_header()).json()
+        result = requests.get(url, params=params, headers=self.construct_auth_header())
+        response = result.json() if len(result.content) > 0 else {}
         
-        self._logger.debug (f'GET from [{url}] receiving response:{response}')
+        self._logger.debug (f'GET from [{url}] receiving response:{response} with status code {result.status_code}')
         
         return utils.json_to_object(json.dumps(response))
 
@@ -65,8 +66,35 @@ class APICaller:
 
         self._logger.info ('Initiating POST call to: {}'.format(url))
         
-        response = requests.post(url, json=json_body, headers=self.construct_auth_header()).json()
+        result = requests.post(url, json=json_body, headers=self.construct_auth_header())
+        response = result.json() if len(result.content) > 0 else {}
         
-        self._logger.debug (f'POST to [{url}] receiving response:{response}')
+        self._logger.debug (f'POST to [{url}] receiving response:{response} with status code {result.status_code}')
+        
+        return utils.json_to_object(json.dumps(response))
+    
+
+    def do_put(self, url, json_body=None):
+        url = self.construct_url(url)
+
+        self._logger.info ('Initiating PUT call to: {}'.format(url))
+        
+        result = requests.put(url, json=json_body, headers=self.construct_auth_header())
+        response = result.json() if len(result.content) > 0 else {}
+        
+        self._logger.debug (f'PUT to [{url}] receiving response:{response} with status code {result.status_code}')
+        
+        return utils.json_to_object(json.dumps(response))
+    
+
+    def do_delete(self, url, json_body=None):
+        url = self.construct_url(url)
+
+        self._logger.info ('Initiating DELETE call to: {}'.format(url))
+        
+        result = requests.delete(url, json=json_body, headers=self.construct_auth_header())
+        response = result.json() if len(result.content) != 0 else {}
+            
+        self._logger.debug (f'DELETE to [{url}] receiving response:{response} with status code {result.status_code}')
         
         return utils.json_to_object(json.dumps(response))

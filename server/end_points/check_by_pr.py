@@ -66,6 +66,8 @@ class DependencyByPR(HMACResource):
                 comment = helpers.comment_maker.comment_pr_dependency(change_list, payload.eventKey, payload.date)
                 self._logger.debug(f'Comment: {comment}')
                 self.api_caller.post_pr_comment(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id, comment)
+                #Unwatch PR
+                self.api_caller.unwatch_pr(payload.pullRequest.toRef.repository.project.key, payload.pullRequest.toRef.repository.slug, payload.pullRequest.id)
 
                 if self._config.jira.allow_comment:
                     jira_key = utils.get_jira_key(payload.pullRequest.fromRef.displayId)

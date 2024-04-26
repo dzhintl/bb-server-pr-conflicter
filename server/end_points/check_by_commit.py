@@ -60,6 +60,8 @@ class DependencyByCommit(DependencyByPR):
                     comments.append(comment)
                     self._logger.debug(f'PR ID: {pr.id}, Comment: {comment}')
                     self.api_caller.post_pr_comment(project_key, repo_slug, pr.id, comment)
+                    #Unwatch PR
+                    self.api_caller.unwatch_pr(project_key, repo_slug, pr.id)
                     
                     if self._config.jira.allow_comment:
                         jira_key = utils.get_jira_key(payload.changes[0].ref.displayId)

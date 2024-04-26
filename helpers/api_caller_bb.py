@@ -11,6 +11,7 @@ class APICallerBB (APICaller):
     URL_PR_CHANGE   = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/changes'
     URL_PR_COMMENT  = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
     URL_COMMIT_PR   = '/rest/api/1.0/projects/{}/repos/{}/commits/{}/pull-requests'
+    URL_UNWATCH_PR  = '/rest/api/latest/projects/{}/repos/{}/pull-requests/{}/watch'
     CONFIG_SECTION  = "BB-API"
 
 
@@ -41,3 +42,7 @@ class APICallerBB (APICaller):
 
     def get_commit_pr(self, project_key, repository_slug, commit_id):
         return self.do_get(self.URL_COMMIT_PR.format(project_key, repository_slug, commit_id), None)
+
+    
+    def unwatch_pr(self, project_key, repository_slug, pr_id):
+        return self.do_delete(self.URL_UNWATCH_PR.format(project_key,repository_slug, pr_id))
