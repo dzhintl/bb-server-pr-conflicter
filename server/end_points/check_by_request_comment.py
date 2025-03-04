@@ -46,7 +46,7 @@ class DependencyByRequest_Comment(APIKeyResource):
             project_key = pay_load.project
 
             # Check if pay_load.file is found, use it, otherwise return 401
-            if not hasattr(pay_load, "file"):
+            if hasattr(pay_load, "file"):
                 file_name   = pay_load.file
             else:
                 return self.process_invalid_schema()
