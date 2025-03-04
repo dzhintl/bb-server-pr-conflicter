@@ -1,7 +1,13 @@
-name: Docker Image CI
+name: Build and Push Docker Image
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
     
 env:
   IMAGE_NAME: ${{ github.repository }}
