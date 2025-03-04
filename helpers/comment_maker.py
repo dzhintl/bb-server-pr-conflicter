@@ -47,9 +47,9 @@ def comment_dependency(change_list, file_name):
         for pull_request in change_list:
             comment += f'\n{markdown_strings.link(pull_request.title,pull_request.links.self[0].href)} \n' \
                             f'- ID: {pull_request.id} \n' \
-                            f'- From: {markdown_strings.esc_format(pull_request.fromRef.displayId)} ' \
+                            f'- From: {markdown_strings.esc_format(pull_request.fromRef.displayId, True)} ' \
                                 f'(Repository:{markdown_strings.link(pull_request.fromRef.repository.name, pull_request.fromRef.repository.links.self[0].href)}) \n'\
-                            f'- To: {markdown_strings.esc_format(pull_request.toRef.displayId)} ' \
+                            f'- To: {markdown_strings.esc_format(pull_request.toRef.displayId, True)} ' \
                                 f'(Repository:{markdown_strings.link(pull_request.toRef.repository.name, pull_request.toRef.repository.links.self[0].href)}) \n'\
                             f'- Created Date: {datetime.utcfromtimestamp(pull_request.createdDate/1000)} \n' \
                             f'- Last Updated: {datetime.utcfromtimestamp(pull_request.updatedDate/1000)} \n' \
