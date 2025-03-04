@@ -1,12 +1,12 @@
 import logging
 import time
 from flask import request
-from server.end_points.check_by_pr import DependencyByPR
+from server.end_points.check_by_pr_comment import DependencyByPR_Comment
 import helpers.comment_maker
 import helpers.utils as utils
 
 
-class DependencyByCommit(DependencyByPR):
+class DependencyByCommit_Comment(DependencyByPR_Comment):
     """ Check and make a comment into Pull Request of the current commit a list of PR Dependencies.
         
         The check is done on all open PRs targeting to the same branch (e.g. master) as the Pull Request of the current commit.

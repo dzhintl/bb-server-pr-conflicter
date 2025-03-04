@@ -5,7 +5,7 @@ import helpers.utils as utils
 import helpers.comment_maker as comment_maker
 from flask import request
 
-class DependencyByRequest(APIKeyResource):
+class DependencyByRequest_Comment(APIKeyResource):
     """ Receive ad-hoc requests and response with list of potential conflicts
     """
 
@@ -38,20 +38,21 @@ class DependencyByRequest(APIKeyResource):
         return api_key
     
 
-    def process_get(self):
+    def process_post(self):
 
         if request.is_json:
             pay_load = self.process_payload()
 
             project_key = pay_load.project
-            # if pay_load.files is found, use it, otherwise use pay_load.file
-            if hasattr(pay_load, "files"):
-                file_list = pay_load.files
+
+            # Check if pay_load.file is found, use it, otherwise return 401
+            if not hasattr(pay_load, "file"):
+                file_name   = pay_load.file
             else:
-                file_list = [pay_load.file]
+                return self.process_invalid_schema()
             repo_slug   = pay_load.repo
 
-            self._logger.info(f'Receiving request to check list of files: {file_list}, project: {project_key}, repo: {repo_slug}')
+            self._logger.info(f'Receiving request to check file: {file_name}, project: {project_key}, repo: {repo_slug}')
 
             result = self.api_caller.get_pull_requests(project_key, repo_slug)
             if hasattr(result, "errors"):
@@ -67,20 +68,12 @@ class DependencyByRequest(APIKeyResource):
                 for pr in all_prs:
                     pr_changes = self.api_caller.get_pr_change(project_key, repo_slug, pr.id).values
                     #Default is Case 2
-                    conflict_changes_list = []
+                    conflict_changes = []
                     #Case 3 if possible
-                    # Go through all files in the PR
-                    for file_name in file_list:
-                        conflict_changes = []
-                        conflict_changes.extend([change for change in pr_changes if change.path.name ==  file_name])
-                        
-                        if len(conflict_changes) > 0:
-                            conflict_changes_list.append({"file": file_name, "changes": conflict_changes})
-                    
-                    if len(conflict_changes_list) > 0:
-                        #reduce pr to only id, title, author, and link
-                        change_list.append({"pr": pr, "conflicts": conflict_changes_list})
+                    conflict_changes.extend([change for change in pr_changes if change.path.name ==  file_name])
+                    if len(conflict_changes) > 0:
+                        change_list.append(pr)
 
-            return {"status":200, "total": len(change_list) , "data": utils.json_namespace_to_dict(change_list)}, 200
+            return {"status":200, "comment": comment_maker.comment_dependency(change_list, file_name)}, 200
         else:
             return {'status': 415, 'message': 'Come on! Give me JSON payload!'}, 415

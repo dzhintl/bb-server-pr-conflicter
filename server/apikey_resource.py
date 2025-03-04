@@ -30,7 +30,20 @@ class APIKeyResource(Resource):
             self._logger.fatal("Configuration setup failed!")
 
     def get(self):
-        return self.process_get()
+        api_key = self.get_header_apikey()
+
+        if api_key is not None and api_key == self.get_config_apikey():
+            try:
+                pay_load = self.process_payload()
+                json_pay_load = utils.json_namespace_to_dict(pay_load)
+                json_schema = self.get_request_schema()
+                validate(instance=json_pay_load, schema=json_schema, format_checker=FormatChecker())
+                return self.process_get()
+            except Exception as error:
+                self._logger.error (f'Receive invalid request with error: {error}')
+                return self.process_invalid_schema()
+
+        return self.process_invalid_apikey()
     
     def post(self):
         api_key = self.get_header_apikey()

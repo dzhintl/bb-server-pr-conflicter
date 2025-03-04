@@ -1,8 +1,9 @@
 import logging
 from server.api_server import APIServer
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from server.end_points.check_by_pr import DependencyByPR
-from server.end_points.check_by_commit import DependencyByCommit
+from server.end_points.check_by_pr_comment import DependencyByPR_Comment
+from server.end_points.check_by_commit_comment import DependencyByCommit_Comment
+from server.end_points.check_by_request_comment import DependencyByRequest_Comment
 from server.end_points.check_by_request import DependencyByRequest
 
 # Parse command line arguments
@@ -23,13 +24,15 @@ if __name__ == '__main__':
 
     
     #API Resources
-    dependency_by_pr     = DependencyByPR([CONF_FILE])
-    dependency_by_commit = DependencyByCommit([CONF_FILE])
-    dependency_by_request= DependencyByRequest([CONF_FILE])
+    dependency_by_pr_comment        = DependencyByPR_Comment([CONF_FILE])
+    dependency_by_commit_comment    = DependencyByCommit_Comment([CONF_FILE])
+    dependency_by_request_comment   = DependencyByRequest_Comment([CONF_FILE])
+    dependency_by_request           = DependencyByRequest([CONF_FILE])
     
     #Setup API Server and end-points
     server = APIServer("BB Branch Checker")
-    server.add_resource(dependency_by_pr, '/check_dependency/by_pr/comment', [CONF_FILE])
-    server.add_resource(dependency_by_commit, '/check_dependency/by_commit/comment', [CONF_FILE])
-    server.add_resource(dependency_by_request, '/check_dependency/by_file/comment', [CONF_FILE])
+    server.add_resource(dependency_by_pr_comment, '/check_dependency/by_pr/comment', [CONF_FILE])
+    server.add_resource(dependency_by_commit_comment, '/check_dependency/by_commit/comment', [CONF_FILE])
+    server.add_resource(dependency_by_request_comment, '/check_dependency/by_file/comment', [CONF_FILE])
+    server.add_resource(dependency_by_request, '/check_dependency/by_file', [CONF_FILE])
     server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))

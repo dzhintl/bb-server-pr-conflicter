@@ -170,3 +170,268 @@ Check and return a comment with a list of potential conflict pull requests.
     "comment": "Conflict checking report for file: *Awesome.txt* \nThere is no potential conflict detected."
 }
 ```
+
+### `/check_dependency/by_file`
+```http
+GET /check_dependency/by_file
+```
+Check and return a list of potential conflict pull requests based on a single or a list of files.
+
+**Authentication**: API Key. Refer to [BB-ADHOC-REQUEST] config section.
+
+**JSON Request Body**
+
+To check a single file
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "file": <Required. File name. String type. Must contain file extension, e.g. "awesome.txt">,
+    "repo": <Required. Repo ID. String type.>
+}
+```
+To check a list of files:
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "files": <Required. List of file names. List type. Must contain file extension, e.g. ["awesome.txt"]>,
+    "repo": <Required. Repo ID. String type.>
+}
+```
+
+**Sample Response**
+```json
+{
+    "status": 200,
+    "total": 1,
+    "data": [
+        {
+            "pr": {
+                "id": 123,
+                "version": 1,
+                "title": "Sample - Release/001 Sample-12345",
+                "description": "* to delete sample_table1, sample_table2\r\n* add in sample_summary1 and sample_summary2\r\n* change tablespace to use SAMPLE_TS",
+                "state": "OPEN",
+                "open": true,
+                "closed": false,
+                "createdDate": 1609459200000,
+                "updatedDate": 1609459200000,
+                "fromRef": {
+                    "id": "refs/heads/release/001_Sample-12345",
+                    "displayId": "release/001_Sample-12345",
+                    "latestCommit": "samplecommitid1234567890abcdef",
+                    "repository": {
+                        "slug": "sample-repo",
+                        "id": 123,
+                        "name": "Sample Repo",
+                        "description": "Sample Description",
+                        "scmId": "git",
+                        "state": "AVAILABLE",
+                        "statusMessage": "Available",
+                        "forkable": true,
+                        "project": {
+                            "key": "SAMPLE",
+                            "id": 123,
+                            "name": "Sample Project",
+                            "description": "Sample Project Description",
+                            "public": false,
+                            "type": "NORMAL",
+                            "links": {
+                                "self": [
+                                    {
+                                        "href": "https://bitbucket.example.com/projects/SAMPLE"
+                                    }
+                                ]
+                            }
+                        },
+                        "public": false,
+                        "links": {
+                            "clone": [
+                                {
+                                    "href": "https://bitbucket.example.com/scm/sample/sample-repo.git",
+                                    "name": "http"
+                                },
+                                {
+                                    "href": "ssh://git@bitbucketssh.example.com:7999/sample/sample-repo.git",
+                                    "name": "ssh"
+                                }
+                            ],
+                            "self": [
+                                {
+                                    "href": "https://bitbucket.example.com/projects/SAMPLE/repos/sample-repo/browse"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "toRef": {
+                    "id": "refs/heads/master",
+                    "displayId": "master",
+                    "latestCommit": "samplecommitid0987654321fedcba",
+                    "repository": {
+                        "slug": "sample-repo",
+                        "id": 123,
+                        "name": "Sample Repo",
+                        "description": "Sample Description",
+                        "scmId": "git",
+                        "state": "AVAILABLE",
+                        "statusMessage": "Available",
+                        "forkable": true,
+                        "project": {
+                            "key": "SAMPLE",
+                            "id": 123,
+                            "name": "Sample Project",
+                            "description": "Sample Project Description",
+                            "public": false,
+                            "type": "NORMAL",
+                            "links": {
+                                "self": [
+                                    {
+                                        "href": "https://bitbucket.example.com/projects/SAMPLE"
+                                    }
+                                ]
+                            }
+                        },
+                        "public": false,
+                        "links": {
+                            "clone": [
+                                {
+                                    "href": "https://bitbucket.example.com/scm/sample/sample-repo.git",
+                                    "name": "http"
+                                },
+                                {
+                                    "href": "ssh://git@bitbucketssh.example.com:7999/sample/sample-repo.git",
+                                    "name": "ssh"
+                                }
+                            ],
+                            "self": [
+                                {
+                                    "href": "https://bitbucket.example.com/projects/SAMPLE/repos/sample-repo/browse"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "locked": false,
+                "author": {
+                    "user": {
+                        "name": "sample.user",
+                        "emailAddress": "sample.user@example.com",
+                        "id": 123,
+                        "displayName": "Sample User",
+                        "active": true,
+                        "slug": "sample.user",
+                        "type": "NORMAL",
+                        "links": {
+                            "self": [
+                                {
+                                    "href": "https://bitbucket.example.com/users/sample.user"
+                                }
+                            ]
+                        }
+                    },
+                    "role": "AUTHOR",
+                    "approved": false,
+                    "status": "UNAPPROVED"
+                },
+                "reviewers": [
+                    {
+                        "user": {
+                            "name": "reviewer.user",
+                            "emailAddress": "reviewer.user@example.com",
+                            "id": 456,
+                            "displayName": "Reviewer User",
+                            "active": true,
+                            "slug": "reviewer.user",
+                            "type": "NORMAL",
+                            "links": {
+                                "self": [
+                                    {
+                                        "href": "https://bitbucket.example.com/users/reviewer.user"
+                                    }
+                                ]
+                            }
+                        },
+                        "role": "REVIEWER",
+                        "approved": false,
+                        "status": "UNAPPROVED"
+                    }
+                ],
+                "participants": [
+                    {
+                        "user": {
+                            "name": "participant.user",
+                            "emailAddress": "participant.user@example.com",
+                            "id": 789,
+                            "displayName": "Participant User",
+                            "active": true,
+                            "slug": "participant.user",
+                            "type": "NORMAL",
+                            "links": {
+                                "self": [
+                                    {
+                                        "href": "https://bitbucket.example.com/users/participant.user"
+                                    }
+                                ]
+                            }
+                        },
+                        "role": "PARTICIPANT",
+                        "approved": false,
+                        "status": "UNAPPROVED"
+                    }
+                ],
+                "properties": {
+                    "mergeResult": {
+                        "outcome": "CLEAN",
+                        "current": true
+                    },
+                    "resolvedTaskCount": 0,
+                    "commentCount": 1,
+                    "openTaskCount": 0
+                },
+                "links": {
+                    "self": [
+                        {
+                            "href": "https://bitbucket.example.com/projects/SAMPLE/repos/sample-repo/pull-requests/123"
+                        }
+                    ]
+                }
+            },
+            "conflicts": [
+                {
+                    "file": "sample_file.sql",
+                    "changes": [
+                        {
+                            "contentId": "samplecontentid1234567890abcdef",
+                            "fromContentId": "samplecontentid0987654321fedcba",
+                            "path": {
+                                "components": [
+                                    "install",
+                                    "proc",
+                                    "sample_file.sql"
+                                ],
+                                "parent": "install/proc",
+                                "name": "sample_file.sql",
+                                "extension": "sql",
+                                "toString": "install/proc/sample_file.sql"
+                            },
+                            "executable": false,
+                            "percentUnchanged": -1,
+                            "type": "MODIFY",
+                            "nodeType": "FILE",
+                            "srcExecutable": false,
+                            "links": {
+                                "self": [
+                                    null
+                                ]
+                            },
+                            "properties": {
+                                "gitChangeType": "MODIFY"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```

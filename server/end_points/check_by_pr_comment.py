@@ -7,7 +7,7 @@ from models.pullrequest import PullRequest
 from server.hmac_resource import HMACResource
 import helpers.comment_maker
 
-class DependencyByPR(HMACResource):
+class DependencyByPR_Comment(HMACResource):
     """ Check and make a comment into the current Pull Request a list of PR Dependencies.
         
         The check is done on all open PRs targeting to the same branch (e.g. master) as the current Pull Request.
