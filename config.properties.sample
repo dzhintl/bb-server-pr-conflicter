@@ -65,6 +65,52 @@ CONFIG={
         }
     }
 
+[BB-API-AFFECTED-CHANGES]
+CONFIG={
+        "api_key":
+        {
+            "key": <Required. API Key of the service. In Base64 encoded format. Leave empty string if API Key is disabled.>,
+            "header": <Required. Header field where the API Key is stored. Leave empty string if API Key is disabled.>
+        },
+        "request_schema":
+        {
+            "type" : "object",
+            "properties" :
+            {
+                "project":
+                {
+                    "type" : "string",
+                    "pattern": "^([A-Za-z])+$"
+                },
+                "pr":
+                {
+                    "type" : "string"
+                },
+                "commit":
+                {
+                    "type" : "string"
+                },
+                "repo":
+                {
+                    "type": "string"
+                }
+            },
+            "oneOf":
+            [
+                {
+                    "required": ["project", "pr", "repo"]
+                },
+                {
+                    "required": ["project", "commit", "repo"]
+                }
+            ]
+        },
+        "bitbucket":
+        {
+            "config": <Required. Path to Bitbucket configuration file.>
+        }
+    }
+
 [BB-API]
 CONFIG={
         "url": <Required. Bitbucket URL, e.g. http://localhost:7990>,

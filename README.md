@@ -39,7 +39,7 @@ optional arguments:
 ```
 
 ### Config file
-The main config file consists of 2 sections:
+The main config file consists of the following sections:
 ```json
 [BB-WEBHOOK]
 CONFIG={
@@ -69,6 +69,20 @@ CONFIG={
             "config": <Required. Path to Bitbucket configuration file.>
         }
     }
+[BB-API-AFFECTED-CHANGES]
+CONFIG={
+        "api_key":
+        {
+            "key": <Required. API Key of the service. In Base64 encoded format. Leave empty string if API Key is disabled.>,
+            "header": <Required. Header field where the API Key is stored. Leave empty string if API Key is disabled.>
+        },
+       ....
+        "bitbucket":
+        {
+            "config": <Required. Path to Bitbucket configuration file.>
+        }
+    }
+```
 ```
 
 Bitbucket configuration file consists of 1 section:
@@ -434,4 +448,49 @@ To check a list of files:
         }
     ]
 }
+```
+
+### `/check_affected_changes`
+```http
+GET /check_affected_changes
+```
+Receive ad-hoc requests and response with list of affected changes in a commit or PR
+
+**Authentication**: API Key. Refer to [BB-API-AFFECTED-CHANGES] config section.
+
+**JSON Request Body**
+
+To check a commit:
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "commit": <Required. Commit ID. String type.>,
+    "repo": <Required. Repo ID. String type.>
+}
+```
+To check a pull request:
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "pr": <Required. Pull request ID>,
+    "repo": <Required. Repo ID. String type.>
+}
+```
+
+**Sample Response**
+```json
+{
+    "status": 200,
+    "data": {
+        "commit": {
+            "id": "459ffae52f23a8d2a7f914d5a18963f283183672",
+            "total": 2,
+            "changes": [...]
+        },
+        "pr": {
+            "id": "54",
+            "total": 2,
+            "changes": [...]
+        }
+    }
 ```

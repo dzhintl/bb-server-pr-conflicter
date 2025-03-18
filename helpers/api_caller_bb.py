@@ -12,6 +12,7 @@ class APICallerBB (APICaller):
     URL_PR_COMMENT  = '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
     URL_COMMIT_PR   = '/rest/api/1.0/projects/{}/repos/{}/commits/{}/pull-requests'
     URL_UNWATCH_PR  = '/rest/api/latest/projects/{}/repos/{}/pull-requests/{}/watch'
+    URL_COMMIT_CHANGE   = '/rest/api/1.0/projects/{}/repos/{}/commits/{}/changes?limit={}'
     CONFIG_SECTION  = "BB-API"
 
 
@@ -31,6 +32,10 @@ class APICallerBB (APICaller):
     
     def get_pr_change (self, project_key, repository_slug, pr_id, limit=200):
         return self.do_get(self.URL_PR_CHANGE.format(project_key,repository_slug, pr_id,limit), None)
+    
+
+    def get_commit_change (self, project_key, repository_slug, commit_id, limit=200):
+        return self.do_get(self.URL_COMMIT_CHANGE.format(project_key,repository_slug, commit_id,limit), None)
 
     
     def post_pr_comment(self, project_key, repository_slug, pr_id, comment:str):

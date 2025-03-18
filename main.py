@@ -1,6 +1,7 @@
 import logging
 from server.api_server import APIServer
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from server.end_points.check_affected_changes import AffectedChangesAPI
 from server.end_points.check_by_pr_comment import DependencyByPR_Comment
 from server.end_points.check_by_commit_comment import DependencyByCommit_Comment
 from server.end_points.check_by_request_comment import DependencyByRequest_Comment
@@ -28,6 +29,7 @@ if __name__ == '__main__':
     dependency_by_commit_comment    = DependencyByCommit_Comment([CONF_FILE])
     dependency_by_request_comment   = DependencyByRequest_Comment([CONF_FILE])
     dependency_by_request           = DependencyByRequest([CONF_FILE])
+    affected_changes                = AffectedChangesAPI([CONF_FILE])
     
     #Setup API Server and end-points
     server = APIServer("BB Branch Checker")
@@ -35,4 +37,5 @@ if __name__ == '__main__':
     server.add_resource(dependency_by_commit_comment, '/check_dependency/by_commit/comment', [CONF_FILE])
     server.add_resource(dependency_by_request_comment, '/check_dependency/by_file/comment', [CONF_FILE])
     server.add_resource(dependency_by_request, '/check_dependency/by_file', [CONF_FILE])
+    server.add_resource(affected_changes, '/check_affected_changes', [CONF_FILE])
     server.start('0.0.0.0', PORT, debug=LOG_LEVEL.upper()==logging.getLevelName(logging.DEBUG))
