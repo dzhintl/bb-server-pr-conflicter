@@ -56,7 +56,7 @@ CONFIG={
         }
     }
 
-[BB-ADHOC-REQUEST]
+[BB-ADHOC-REQUEST]/[BB-API-AFFECTED-CHANGES]/[BB-API-COMMIT-PR]
 CONFIG={
         "api_key":
         {
@@ -69,20 +69,6 @@ CONFIG={
             "config": <Required. Path to Bitbucket configuration file.>
         }
     }
-[BB-API-AFFECTED-CHANGES]
-CONFIG={
-        "api_key":
-        {
-            "key": <Required. API Key of the service. In Base64 encoded format. Leave empty string if API Key is disabled.>,
-            "header": <Required. Header field where the API Key is stored. Leave empty string if API Key is disabled.>
-        },
-       ....
-        "bitbucket":
-        {
-            "config": <Required. Path to Bitbucket configuration file.>
-        }
-    }
-```
 ```
 
 Bitbucket configuration file consists of 1 section:
@@ -493,4 +479,34 @@ To check a pull request:
             "changes": [...]
         }
     }
+}
+```
+### `/check_commit_pr`
+```http
+GET /check_commit_pr
+```
+Receive ad-hoc requests and response with list of PRs for a commit
+
+**Authentication**: API Key. Refer to [BB-API-COMMIT-PR] config section.
+
+**JSON Request Body**
+```json
+{
+    "project": <Required. Project ID. String type. Contains only alphabet characters.>,
+    "commit": <Required. Commit ID. String type.>,
+    "repo": <Required. Repo ID. String type.>,
+    "status": <Optional. Filtered status. Default is to return all PRs. Must be in: OPEN, MERGED, DECLINED, DELETED>,
+    "target": <Optional. Filtered target. Default is to return all PRs. (e.g. target=master will only return PRs with target master)>
+}
+```
+
+**Sample Response**
+```json
+{
+    "status": 200,
+    "total": 3,
+    "data": [
+        {...}
+    ]
+}
 ```

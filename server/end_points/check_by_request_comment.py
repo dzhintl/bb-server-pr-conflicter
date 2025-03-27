@@ -6,7 +6,7 @@ import helpers.comment_maker as comment_maker
 from flask import request
 
 class DependencyByRequest_Comment(APIKeyResource):
-    """ Receive ad-hoc requests and response with list of potential conflicts
+    """ Receive ad-hoc requests to check if a file is in conflict with other PRs and return the result as markdown comment
     """
 
     CONFIG_SECTION = "BB-ADHOC-REQUEST"
