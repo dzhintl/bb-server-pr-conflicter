@@ -2,7 +2,7 @@ import logging
 from helpers.api_caller_bb import APICallerBB
 from server.apikey_resource import APIKeyResource
 import helpers.utils as utils
-import helpers.comment_maker as comment_maker
+from flask_restful.reqparse import RequestParser
 from flask import request
 
 class DependencyByRequest(APIKeyResource):
@@ -12,11 +12,13 @@ class DependencyByRequest(APIKeyResource):
     CONFIG_SECTION = "BB-ADHOC-REQUEST"
 
     _logger = logging.getLogger(__name__)
+    request_parser = RequestParser()
 
     api_caller: APICallerBB
 
     def __init__(self, *args) -> None:
         super().__init__(*args)
+        self.request_parser.add_argument('target', default='any')
         self.api_caller = APICallerBB(self._config.bitbucket.config)
 
     def get_config_apikey(self):
@@ -58,6 +60,15 @@ class DependencyByRequest(APIKeyResource):
                 return {"status": 200, "comment": result.errors[0].message}, 200
 
             all_prs = result.values
+
+            #Get request parameter
+            args = self.request_parser.parse_args()
+            target = args['target'].lower()
+
+            # If target is not 'any', check if the target is in the list of PRs
+            if target != 'any':
+                all_prs = [pr for pr in all_prs if pr.toRef.displayId == target]
+
             #Case 1 - No other PR
             change_list = []
             
